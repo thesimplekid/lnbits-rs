@@ -33,32 +33,6 @@ pub enum LNBitsError {
 
 impl LNBitsClient {
     /// Create a new LNBitsClient
-    /// # Arguments
-    /// * `wallet_id` - The wallet id of the LNBits wallet
-    /// * `admin_key` - The admin key of the LNBits wallet
-    /// * `invoice_read_key` - The invoice read key of the LNBits wallet
-    /// * `lnbits_url` - The url of the LNBits instance
-    /// * `tor_socket` - If defined, the tor socket to use
-    ///
-    /// # Example
-    /// ```
-    /// use lnbits_rust::LNBitsClient;
-    /// let client = LNBitsClient::new(
-    ///    "wallet_id",
-    ///    "admin_key",
-    ///    "invoice_read_key",
-    ///    "http://localhost:5000",
-    ///    None,
-    /// ).unwrap();
-    ///
-    /// let client_using_tor = LNBitsClient::new(
-    ///    "wallet_id",
-    ///    "admin_key",
-    ///    "invoice_read_key",
-    ///    "http://oooo.onion",
-    ///    Some("socks5h://127.0.0.1:9050"),
-    /// ).unwrap();
-    /// ```
     pub fn new(
         // Can be used later
         _wallet_id: &str,
