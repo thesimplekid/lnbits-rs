@@ -29,6 +29,12 @@ pub enum LNBitsError {
 
     #[error("Unauthorized")]
     Unauthorized,
+
+    #[error("Could not wait for paid invoices")]
+    InvoiceStream,
+
+    #[error("Invalid Header")]
+    InvalidHeader,
 }
 
 impl LNBitsClient {

@@ -81,6 +81,7 @@ impl crate::LNBitsClient {
         Ok(invoice_result)
     }
 
+    /// Decode bolt11 invoice
     pub async fn decode_invoice(
         &self,
         invoice: &str,
@@ -97,6 +98,7 @@ impl crate::LNBitsClient {
         Ok(invoice_result)
     }
 
+    /// Check if invoice paid
     pub async fn is_invoice_paid(&self, payment_hash: &str) -> Result<bool, crate::LNBitsError> {
         let body = self
             .make_get(
