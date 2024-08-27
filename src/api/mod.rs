@@ -1,6 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 pub mod invoice;
 pub mod wallet;
 
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsRequestKey {
     Admin,
     InvoiceRead,
