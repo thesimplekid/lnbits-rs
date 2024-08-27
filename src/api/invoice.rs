@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::LNBitsEndpoint;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateInvoiceResult {
     pub payment_hash: String,
@@ -55,7 +57,7 @@ impl crate::LNBitsClient {
 
         let body = self
             .make_post(
-                "api/v1/payments",
+                LNBitsEndpoint::Payments,
                 crate::api::LNBitsRequestKey::InvoiceRead,
                 &serde_json::to_string(&params)?,
             )
@@ -69,7 +71,7 @@ impl crate::LNBitsClient {
     pub async fn pay_invoice(&self, bolt11: &str) -> Result<PayInvoiceResult, crate::LNBitsError> {
         let body = self
             .make_post(
-                "api/v1/payments",
+                LNBitsEndpoint::Payments,
                 crate::api::LNBitsRequestKey::Admin,
                 &serde_json::to_string(&serde_json::json!({ "out": true, "bolt11": bolt11 }))?,
             )
@@ -85,7 +87,7 @@ impl crate::LNBitsClient {
     ) -> Result<DecodedInvoice, crate::LNBitsError> {
         let body = self
             .make_post(
-                "api/v1/payments/decode",
+                LNBitsEndpoint::PaymentsDecode,
                 crate::api::LNBitsRequestKey::Admin,
                 &serde_json::to_string(&serde_json::json!({ "data": invoice }))?,
             )
@@ -98,7 +100,7 @@ impl crate::LNBitsClient {
     pub async fn is_invoice_paid(&self, payment_hash: &str) -> Result<bool, crate::LNBitsError> {
         let body = self
             .make_get(
-                &format!("api/v1/payments/{payment_hash}"),
+                LNBitsEndpoint::PaymentHash(payment_hash.to_string()),
                 crate::api::LNBitsRequestKey::Admin,
             )
             .await?;

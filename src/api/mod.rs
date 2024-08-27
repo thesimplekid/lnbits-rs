@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 
 pub mod invoice;
@@ -9,13 +11,32 @@ pub enum LNBitsRequestKey {
     InvoiceRead,
 }
 
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
+pub enum LNBitsEndpoint {
+    Payments,
+    PaymentsDecode,
+    PaymentHash(String),
+    Wallet,
+}
+
+impl fmt::Display for LNBitsEndpoint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LNBitsEndpoint::Payments => write!(f, "api/v1/payments"),
+            LNBitsEndpoint::PaymentsDecode => write!(f, "api/v1/payments/decode"),
+            LNBitsEndpoint::PaymentHash(hash) => write!(f, "api/v1/payments/{}", hash),
+            LNBitsEndpoint::Wallet => write!(f, "api/v1/wallet"),
+        }
+    }
+}
+
 impl crate::LNBitsClient {
     pub async fn make_get(
         &self,
-        endpoint: &str,
+        endpoint: LNBitsEndpoint,
         key: LNBitsRequestKey,
     ) -> Result<String, crate::LNBitsError> {
-        let url = self.lnbits_url.join(endpoint)?;
+        let url = self.lnbits_url.join(&endpoint.to_string())?;
         let response = self
             .reqwest_client
             .get(url)
@@ -39,11 +60,11 @@ impl crate::LNBitsClient {
 
     pub async fn make_post(
         &self,
-        endpoint: &str,
+        endpoint: LNBitsEndpoint,
         key: LNBitsRequestKey,
         body: &str,
     ) -> Result<String, crate::LNBitsError> {
-        let url = self.lnbits_url.join(endpoint)?;
+        let url = self.lnbits_url.join(&endpoint.to_string())?;
         let response = self
             .reqwest_client
             .post(url)
