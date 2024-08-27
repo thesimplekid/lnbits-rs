@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod invoice;
 pub mod wallet;
+pub mod webhook;
 
 #[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsRequestKey {
@@ -16,6 +17,7 @@ pub enum LNBitsEndpoint {
     Payments,
     PaymentsDecode,
     PaymentHash(String),
+    PaymentsFindInvoice(String),
     Wallet,
 }
 
@@ -26,6 +28,9 @@ impl fmt::Display for LNBitsEndpoint {
             LNBitsEndpoint::PaymentsDecode => write!(f, "api/v1/payments/decode"),
             LNBitsEndpoint::PaymentHash(hash) => write!(f, "api/v1/payments/{}", hash),
             LNBitsEndpoint::Wallet => write!(f, "api/v1/wallet"),
+            LNBitsEndpoint::PaymentsFindInvoice(checking_id) => {
+                write!(f, "api/v1/payments?checking_is={}", checking_id)
+            }
         }
     }
 }

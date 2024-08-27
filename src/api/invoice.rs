@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
-use super::LNBitsEndpoint;
+use super::{LNBitsEndpoint, LNBitsRequestKey};
+use crate::LNBitsError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateInvoiceResult {
@@ -8,23 +11,23 @@ pub struct CreateInvoiceResult {
     pub payment_request: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PayInvoiceResult {
     pub payment_hash: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CreateInvoiceParams {
-    pub amount: i64,
+    pub amount: u64,
     pub unit: String,
     pub memo: Option<String>,
     /// expiry is in seconds
-    pub expiry: Option<i64>,
+    pub expiry: Option<u64>,
     pub webhook: Option<String>,
     pub internal: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DecodedInvoice {
     pub payment_hash: String,
     pub amount_msat: i64,
@@ -36,6 +39,24 @@ pub struct DecodedInvoice {
     pub secret: String,
     pub route_hints: Vec<String>,
     pub min_final_cltv_expiry: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FindInvoiceResponse {
+    pub checking_id: String,
+    pub pending: bool,
+    pub amount: i64,
+    pub fee: i64,
+    pub memo: String,
+    pub time: u64,
+    pub bolt11: String,
+    pub preimage: Option<String>,
+    pub payment_hash: String,
+    pub expiry: u64,
+    pub extra: HashMap<String, serde_json::Value>,
+    pub wallet_id: String,
+    pub webhook: Option<String>,
+    pub webhook_status: Option<String>,
 }
 
 impl crate::LNBitsClient {
@@ -107,5 +128,18 @@ impl crate::LNBitsClient {
 
         let invoice_result: serde_json::Value = serde_json::from_str(&body)?;
         Ok(invoice_result["paid"].as_bool().unwrap_or(false))
+    }
+
+    pub async fn find_invoice(
+        &self,
+        checking_id: &str,
+    ) -> Result<FindInvoiceResponse, LNBitsError> {
+        let endpoint = LNBitsEndpoint::PaymentsFindInvoice(checking_id.to_string());
+
+        let response = self.make_get(endpoint, LNBitsRequestKey::Admin).await?;
+
+        let find_invoice_response: FindInvoiceResponse = serde_json::from_str(&response)?;
+
+        Ok(find_invoice_response)
     }
 }
