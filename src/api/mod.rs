@@ -3,10 +3,9 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 
 pub mod invoice;
-pub mod paid_invoice_stream;
 pub mod wallet;
 
-#[derive(Debug, Clone, Copy, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsRequestKey {
     Admin,
     InvoiceRead,
