@@ -14,12 +14,12 @@ authors = ["thesimplekid <tsk@thesimplekid.com>"]
 [dependencies]
 anyhow = "1"
 axum = "0.7.5"
-reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls-webpki-roots", "socks"] }
-tokio = { version = "1.25", features = ["macros", "rt-multi-thread"] }
+reqwest = { version = "0.12", default-features = false, features = ["json",
+    "rustls-tls",
+    "rustls-tls-native-roots",
+    "socks"]}
+tokio = { version = "1", default-features = false }
 serde_json = { version = "1", default-features = false, features = ["std"] }
 serde = { version = "1", default-features = false, features = ["derive"] }
-serde_derive = "1"
-thiserror = "1"
 url = "2.3"
-tokio-test = "0.4"
 log = "0.4"
