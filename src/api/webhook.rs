@@ -2,9 +2,9 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::api::invoice::FindInvoiceResponse;
 use crate::LNBitsClient;
 
 /// Webhook state
@@ -32,10 +32,10 @@ impl LNBitsClient {
 }
 
 async fn handle_invoice(
-    State(_state): State<WebhookState>,
+    State(state): State<WebhookState>,
     Json(payload): Json<Value>,
 ) -> Result<StatusCode, StatusCode> {
-    let webhook_response: WebhookResponse =
+    let webhook_response: FindInvoiceResponse =
         serde_json::from_value(payload.clone()).map_err(|_err| {
             log::warn!("Got an invalid payload on webhook");
             log::debug!("Value: {}", payload);
@@ -43,22 +43,14 @@ async fn handle_invoice(
             StatusCode::UNPROCESSABLE_ENTITY
         })?;
 
-    log::debug!("Received webhook update for: {}", webhook_response.data);
+    log::debug!(
+        "Received webhook update for: {}",
+        webhook_response.checking_id
+    );
+
+    if let Err(err) = state.sender.send(webhook_response.checking_id).await {
+        log::warn!("Could not send on channel: {}", err);
+    }
 
     Ok(StatusCode::OK)
-}
-
-/// Webhook response
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct WebhookResponse {
-    /// Webhook id
-    pub id: String,
-    /// Webhook url
-    pub data: String,
-    /// Webhook Version
-    pub webhook_version: String,
-    /// Enabled
-    pub enabled: bool,
-    /// Event types
-    pub event_types: Vec<String>,
 }

@@ -30,7 +30,7 @@ impl fmt::Display for LNBitsEndpoint {
             LNBitsEndpoint::PaymentHash(hash) => write!(f, "api/v1/payments/{}", hash),
             LNBitsEndpoint::Wallet => write!(f, "api/v1/wallet"),
             LNBitsEndpoint::PaymentsFindInvoice(checking_id) => {
-                write!(f, "api/v1/payments?checking_is={}", checking_id)
+                write!(f, "api/v1/payments?checking_id={}", checking_id)
             }
         }
     }

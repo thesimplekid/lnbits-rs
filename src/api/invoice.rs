@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use serde::{Deserialize, Serialize};
 
 use super::{LNBitsEndpoint, LNBitsRequestKey};
@@ -47,7 +47,7 @@ pub struct DecodedInvoice {
     pub min_final_cltv_expiry: i64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FindInvoiceResponse {
     pub checking_id: String,
     pub pending: bool,
@@ -59,7 +59,7 @@ pub struct FindInvoiceResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preimage: Option<String>,
     pub payment_hash: String,
-    pub expiry: u64,
+    pub expiry: f64,
     pub extra: HashMap<String, serde_json::Value>,
     pub wallet_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -148,8 +148,12 @@ impl crate::LNBitsClient {
 
         let body = self.make_get(endpoint, LNBitsRequestKey::Admin).await?;
 
-        match serde_json::from_str(&body) {
-            Ok(res) => Ok(res),
+        match serde_json::from_str::<Vec<FindInvoiceResponse>>(&body) {
+            Ok(res) => {
+                let found = res.first().ok_or(anyhow!("Could not find invoice"))?;
+
+                Ok(found.to_owned())
+            }
             Err(_) => {
                 log::error!("Api error response decode invoice");
                 log::error!("{}", body);
