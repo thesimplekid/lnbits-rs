@@ -1,3 +1,4 @@
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 
 use super::LNBitsEndpoint;
@@ -11,15 +12,20 @@ pub struct WalletDetails {
 }
 
 impl crate::LNBitsClient {
-    pub async fn get_wallet_details(&self) -> Result<WalletDetails, crate::LNBitsError> {
+    pub async fn get_wallet_details(&self) -> Result<WalletDetails> {
         let body = self
             .make_get(
                 LNBitsEndpoint::Wallet,
                 crate::api::LNBitsRequestKey::InvoiceRead,
             )
             .await?;
-        let wallet_details: WalletDetails = serde_json::from_str(&body)?;
-
-        Ok(wallet_details)
+        match serde_json::from_str(&body) {
+            Ok(res) => Ok(res),
+            Err(_) => {
+                log::error!("Api error response on get wallet details");
+                log::error!("{}", body);
+                bail!("Could not get wallet details")
+            }
+        }
     }
 }

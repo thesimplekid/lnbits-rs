@@ -1,5 +1,6 @@
 use std::fmt;
 
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 
 pub mod invoice;
@@ -40,7 +41,7 @@ impl crate::LNBitsClient {
         &self,
         endpoint: LNBitsEndpoint,
         key: LNBitsRequestKey,
-    ) -> Result<String, crate::LNBitsError> {
+    ) -> Result<String> {
         let url = self.lnbits_url.join(&endpoint.to_string())?;
         let response = self
             .reqwest_client
@@ -55,7 +56,7 @@ impl crate::LNBitsClient {
             .await?;
 
         if response.status() == reqwest::StatusCode::NOT_FOUND {
-            return Err(crate::LNBitsError::NotFound);
+            bail!("Not found")
         }
 
         let body = response.text().await?;
@@ -68,7 +69,7 @@ impl crate::LNBitsClient {
         endpoint: LNBitsEndpoint,
         key: LNBitsRequestKey,
         body: &str,
-    ) -> Result<String, crate::LNBitsError> {
+    ) -> Result<String> {
         let url = self.lnbits_url.join(&endpoint.to_string())?;
         let response = self
             .reqwest_client
@@ -84,11 +85,11 @@ impl crate::LNBitsClient {
             .await?;
 
         if response.status() == reqwest::StatusCode::NOT_FOUND {
-            return Err(crate::LNBitsError::NotFound);
+            bail!("Not Found")
         }
 
         if response.status() == reqwest::StatusCode::UNAUTHORIZED {
-            return Err(crate::LNBitsError::Unauthorized);
+            bail!("Unauthorized")
         }
 
         let body = response.text().await?;

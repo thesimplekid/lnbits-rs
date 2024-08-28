@@ -1,6 +1,7 @@
-pub mod api;
-
+use anyhow::Result;
 use reqwest::Url;
+
+pub mod api;
 
 #[derive(Clone)]
 /// The LNBitsClient struct
@@ -13,24 +14,6 @@ pub struct LNBitsClient {
     reqwest_client: reqwest::Client,
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum LNBitsError {
-    #[error("reqwest error: {0}")]
-    ReqwestError(#[from] reqwest::Error),
-
-    #[error("url error: {0}")]
-    UrlError(#[from] url::ParseError),
-
-    #[error("serde error: {0}")]
-    SerdeError(#[from] serde_json::Error),
-
-    #[error("Not found")]
-    NotFound,
-
-    #[error("Unauthorized")]
-    Unauthorized,
-}
-
 impl LNBitsClient {
     /// Create a new LNBitsClient
     pub fn new(
@@ -40,7 +23,7 @@ impl LNBitsClient {
         invoice_read_key: &str,
         lnbits_url: &str,
         tor_socket: Option<&str>,
-    ) -> Result<LNBitsClient, LNBitsError> {
+    ) -> Result<LNBitsClient> {
         let lnbits_url = Url::parse(lnbits_url)?;
 
         let client = {
