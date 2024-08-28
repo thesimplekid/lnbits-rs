@@ -1,3 +1,5 @@
+//! Invoice related api
+
 use std::collections::HashMap;
 
 use anyhow::{anyhow, bail, Result};
@@ -5,65 +7,103 @@ use serde::{Deserialize, Serialize};
 
 use super::{LNBitsEndpoint, LNBitsRequestKey};
 
+/// Create invoice response
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CreateInvoiceResult {
+pub struct CreateInvoiceResponse {
+    /// Payment hash
     pub payment_hash: String,
+    /// Payment request (bolt11)
     pub payment_request: String,
 }
 
+/// Pay invoice response
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct PayInvoiceResult {
+pub struct PayInvoiceResponse {
+    /// Payment hash
     pub payment_hash: String,
 }
 
+/// Create invoice request
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CreateInvoiceParams {
+pub struct CreateInvoiceRequest {
+    /// Amount (sat)
     pub amount: u64,
+    /// Unit
     pub unit: String,
+    /// Memo
     #[serde(skip_serializing_if = "Option::is_none")]
     pub memo: Option<String>,
-    /// expiry is in seconds
+    /// Expiry is in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
+    /// Webhook url
     #[serde(skip_serializing_if = "Option::is_none")]
     pub webhook: Option<String>,
+    /// Internal payment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub internal: Option<bool>,
+    /// Incoming or outgoing payment
     pub out: bool,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DecodedInvoice {
+/// Decode invoice response
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DecodInvoiceResponse {
+    /// Payment hash
     pub payment_hash: String,
+    /// Amount (msat)
     pub amount_msat: i64,
+    /// Description
     pub description: String,
+    /// Description hash
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_hash: Option<String>,
+    /// Payee
     pub payee: String,
+    /// Date
     pub date: i64,
-    pub expiry: i64,
+    /// Expiry
+    pub expiry: f64,
+    /// Secret
     pub secret: String,
+    /// Route hints
     pub route_hints: Vec<String>,
+    /// Mint final cltx expiry
     pub min_final_cltv_expiry: i64,
 }
 
+/// Find invoice response
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FindInvoiceResponse {
+    /// Checking id
     pub checking_id: String,
+    /// Pending (paid)
     pub pending: bool,
+    /// Amount (sat)
     pub amount: i64,
+    /// Fee (msat)
     pub fee: i64,
+    /// Memo
     pub memo: String,
+    /// Time
     pub time: u64,
+    /// Bolt11
     pub bolt11: String,
+    /// Preimage
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preimage: Option<String>,
+    /// Payment hash
     pub payment_hash: String,
+    /// Expiry
     pub expiry: f64,
+    /// Extra
     pub extra: HashMap<String, serde_json::Value>,
+    /// Wallet id
     pub wallet_id: String,
+    /// Webhook url
     #[serde(skip_serializing_if = "Option::is_none")]
     pub webhook: Option<String>,
+    /// Webhook status
     #[serde(skip_serializing_if = "Option::is_none")]
     pub webhook_status: Option<String>,
 }
@@ -72,8 +112,8 @@ impl crate::LNBitsClient {
     /// Create an invoice
     pub async fn create_invoice(
         &self,
-        params: &CreateInvoiceParams,
-    ) -> Result<CreateInvoiceResult> {
+        params: &CreateInvoiceRequest,
+    ) -> Result<CreateInvoiceResponse> {
         let body = self
             .make_post(
                 LNBitsEndpoint::Payments,
@@ -93,7 +133,7 @@ impl crate::LNBitsClient {
     }
 
     /// Pay an invoice
-    pub async fn pay_invoice(&self, bolt11: &str) -> Result<PayInvoiceResult> {
+    pub async fn pay_invoice(&self, bolt11: &str) -> Result<PayInvoiceResponse> {
         let body = self
             .make_post(
                 LNBitsEndpoint::Payments,
@@ -112,7 +152,8 @@ impl crate::LNBitsClient {
         }
     }
 
-    pub async fn decode_invoice(&self, invoice: &str) -> Result<DecodedInvoice> {
+    /// Decode invoice
+    pub async fn decode_invoice(&self, invoice: &str) -> Result<DecodInvoiceResponse> {
         let body = self
             .make_post(
                 LNBitsEndpoint::PaymentsDecode,
@@ -131,6 +172,7 @@ impl crate::LNBitsClient {
         }
     }
 
+    /// Check if invoice paid
     pub async fn is_invoice_paid(&self, payment_hash: &str) -> Result<bool> {
         let body = self
             .make_get(
@@ -143,6 +185,7 @@ impl crate::LNBitsClient {
         Ok(invoice_result["paid"].as_bool().unwrap_or(false))
     }
 
+    /// Find invoice
     pub async fn find_invoice(&self, checking_id: &str) -> Result<FindInvoiceResponse> {
         let endpoint = LNBitsEndpoint::PaymentsFindInvoice(checking_id.to_string());
 

@@ -1,3 +1,5 @@
+//! LNBits api
+
 use std::fmt;
 
 use anyhow::{bail, Result};
@@ -7,18 +9,27 @@ pub mod invoice;
 pub mod wallet;
 pub mod webhook;
 
+/// LNBits api key type
 #[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsRequestKey {
+    /// Admin api key
     Admin,
+    /// Read invoice api key
     InvoiceRead,
 }
 
+/// LNBits endpoints
 #[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsEndpoint {
+    /// Payments endpoint
     Payments,
+    /// Decode payments endpoint
     PaymentsDecode,
+    /// Payments endpoint with hash
     PaymentHash(String),
+    /// Find Payements invoice
     PaymentsFindInvoice(String),
+    /// Wallet info endpoint
     Wallet,
 }
 
@@ -37,6 +48,7 @@ impl fmt::Display for LNBitsEndpoint {
 }
 
 impl crate::LNBitsClient {
+    /// Make get request
     pub async fn make_get(
         &self,
         endpoint: LNBitsEndpoint,
@@ -64,6 +76,7 @@ impl crate::LNBitsClient {
         Ok(body)
     }
 
+    /// Make post request
     pub async fn make_post(
         &self,
         endpoint: LNBitsEndpoint,
