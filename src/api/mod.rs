@@ -1,4 +1,4 @@
-//! LNBits api
+//! LNbits api
 
 use std::fmt;
 
@@ -9,7 +9,7 @@ pub mod invoice;
 pub mod wallet;
 pub mod webhook;
 
-/// LNBits api key type
+/// LNbits api key type
 #[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsRequestKey {
     /// Admin api key
@@ -18,7 +18,7 @@ pub enum LNBitsRequestKey {
     InvoiceRead,
 }
 
-/// LNBits endpoints
+/// LNbits endpoints
 #[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum LNBitsEndpoint {
     /// Payments endpoint
