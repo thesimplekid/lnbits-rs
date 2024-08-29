@@ -1,7 +1,7 @@
 # lnbits-rs
 
 
-An ergonomic, [LNBits](https://lnbits.com/) API Client for Rust.
+An ergonomic, [LNbits](https://lnbits.com/) API Client for Rust.
 
 
 
