@@ -23,3 +23,10 @@ serde_json = { version = "1", default-features = false, features = ["std"] }
 serde = { version = "1", default-features = false, features = ["derive"] }
 url = "2.3"
 log = "0.4"
+
+[profile]
+
+[profile.ci]
+inherits = "dev"
+incremental = false
+lto = "off"
