@@ -1,6 +1,6 @@
 [package]
 name = "lnbits-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "A Rust library for the LNbits API"
 documentation = "https://docs.rs/lnbits-rs"
@@ -10,6 +10,7 @@ keywords = ["lnbits", "rust", "lnbit", "client"]
 categories = ["api-bindings"]
 license = "MIT"
 authors = ["thesimplekid <tsk@thesimplekid.com>"]
+rust-version = "1.63.0" # MSRV
 
 [dependencies]
 anyhow = "1"
