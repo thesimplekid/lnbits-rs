@@ -6,6 +6,7 @@ use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 
 pub mod invoice;
+pub mod payment;
 pub mod wallet;
 pub mod webhook;
 
