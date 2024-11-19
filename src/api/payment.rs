@@ -22,7 +22,7 @@ pub struct PaymentDetails {
     pub memo: String,
     /// Time
     pub time: u64,
-    /// BOlt11
+    /// BOld11
     pub bolt11: String,
     /// Preimage
     pub preimage: String,
