@@ -133,7 +133,11 @@ impl crate::LNBitsClient {
     }
 
     /// Pay an invoice
-    pub async fn pay_invoice(&self, bolt11: &str) -> Result<PayInvoiceResponse> {
+    pub async fn pay_invoice(
+        &self,
+        bolt11: &str,
+        _amount_sats: Option<u64>,
+    ) -> Result<PayInvoiceResponse> {
         let body = self
             .make_post(
                 LNBitsEndpoint::Payments,

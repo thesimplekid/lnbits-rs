@@ -1,6 +1,6 @@
 [package]
 name = "lnbits-rs"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 description = "A Rust library for the LNbits API"
 documentation = "https://docs.rs/lnbits-rs"
@@ -10,11 +10,11 @@ keywords = ["lnbits", "rust", "lnbit", "client"]
 categories = ["api-bindings"]
 license = "MIT"
 authors = ["thesimplekid <tsk@thesimplekid.com>"]
-rust-version = "1.63.0" # MSRV
+rust-version = "1.75.0" # MSRV
 
 [dependencies]
 anyhow = "1"
-axum = "0.6.20"
+axum = "0.8.1"
 reqwest = { version = "0.12", default-features = false, features = ["json",
     "rustls-tls",
     "rustls-tls-native-roots",
