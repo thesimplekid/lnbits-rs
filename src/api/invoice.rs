@@ -12,8 +12,8 @@ use super::{LNBitsEndpoint, LNBitsRequestKey};
 pub struct CreateInvoiceResponse {
     /// Payment hash
     pub payment_hash: String,
-    /// Payment request (bolt11)
-    pub payment_request: String,
+    /// Bolt11
+    pub bolt11: String,
 }
 
 /// Pay invoice response
