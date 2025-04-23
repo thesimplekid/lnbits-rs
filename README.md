@@ -1,9 +1,6 @@
 # lnbits-rs
 
-
-An ergonomic, [LNbits](https://lnbits.com/) API Client for Rust.
-
-
+A comprehensive Rust client for the [LNbits](https://lnbits.com/) API. LNbits is a free and open-source lightning wallet and account system.
 
 ## Key features
 
@@ -14,15 +11,27 @@ An ergonomic, [LNbits](https://lnbits.com/) API Client for Rust.
 - [x] Get wallet details
 - [x] Tor support
 
-## Minimum Supported Rust Version (MSRV)
+## Usage
 
-The `phoenixd` library should always compile with any combination of features on Rust **1.63.0**.
+```rust
+use lnbits_rs::LNBitsClient;
 
-To build and test with the MSRV you will need to pin the below dependency versions:
-
-```shell
-cargo update -p tokio --precise 1.38.1
-cargo update -p reqwest --precise 0.12.4
+async fn example() -> anyhow::Result<()> {
+    // Create a new client
+    let client = LNBitsClient::new(
+        "wallet_id",
+        "admin_key",
+        "invoice_read_key",
+        "https://legend.lnbits.com",
+        None, // Optional Tor socket
+    )?;
+    
+    // Get wallet details
+    let wallet = client.get_wallet_details().await?;
+    println!("Wallet balance: {} sats", wallet.balance);
+    
+    Ok(())
+}
 ```
 
 ## License
