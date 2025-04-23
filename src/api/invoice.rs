@@ -21,15 +21,7 @@ pub struct CreateInvoiceResponse {
 impl CreateInvoiceResponse {
     /// Get bolt11 from response
     pub fn bolt11(&self) -> Option<String> {
-        if let Some(bolt11) = self.bolt11.clone() {
-            return Some(bolt11);
-        }
-
-        if let Some(payment_request) = self.payment_request.clone() {
-            return Some(payment_request);
-        }
-
-        None
+        self.bolt11.clone().or_else(|| self.payment_request.clone())
     }
 }
 
