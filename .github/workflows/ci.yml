@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - version: 1.63.0
+          - version: 1.75.0
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -33,8 +33,6 @@ jobs:
     - name: Fixes for MSRV
       run: |
           cargo update
-          cargo update -p tokio --precise 1.38.1
-          cargo update -p reqwest --precise 0.12.4
     - name: Set profile
       run: rustup set profile minimal && rustup component add clippy
     - name: Build
