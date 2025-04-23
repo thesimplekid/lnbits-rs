@@ -13,7 +13,24 @@ pub struct CreateInvoiceResponse {
     /// Payment hash
     pub payment_hash: String,
     /// Bolt11
-    pub bolt11: String,
+    pub bolt11: Option<String>,
+    /// payment request (PRE v1)
+    pub payment_request: Option<String>,
+}
+
+impl CreateInvoiceResponse {
+    /// Get bolt11 from response
+    pub fn bolt11(&self) -> Option<String> {
+        if let Some(bolt11) = self.bolt11.clone() {
+            return Some(bolt11);
+        }
+
+        if let Some(payment_request) = self.payment_request.clone() {
+            return Some(payment_request);
+        }
+
+        None
+    }
 }
 
 /// Pay invoice response
