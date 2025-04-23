@@ -16,3 +16,5 @@ Cargo.lock
 /Cargo.lock
 
 main.rs
+.pre-commit-config.yaml
+.aider*

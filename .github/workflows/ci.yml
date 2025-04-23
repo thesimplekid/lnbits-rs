@@ -10,32 +10,59 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-msrv:
-    name:
+  pre-commit-checks:
+    name: "Cargo fmt, typos"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - version: 1.63.0
+    timeout-minutes: 15
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Cache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml','**/Cargo.lock') }}
-    - name: Set default toolchain
-      run: rustup default ${{ matrix.rust.version }}
-    - name: Fixes for MSRV
-      run: |
-          cargo update
-          cargo update -p tokio --precise 1.38.1
-          cargo update -p reqwest --precise 0.12.4
-    - name: Set profile
-      run: rustup set profile minimal && rustup component add clippy
-    - name: Build
-      run: cargo build
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v11
+      - name: Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v6
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Cargo fmt
+        run: |
+          nix develop -i -L .#nightly --command bash -c '
+            # Force use of Nix-provided rustfmt
+            export RUSTFMT=$(command -v rustfmt)
+            cargo fmt --check
+          '
+      - name: typos
+        run: nix develop -i -L --command typos
+  
+  clippy:
+    name: "Clippy"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v11
+      - name: Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v6
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Clippy
+        run: nix develop -i -L --command cargo clippy -- -D warnings
+
+  msrv-build:
+    name: "MSRV build"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [pre-commit-checks, clippy]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v11
+      - name: Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v6
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: nix develop -i -L .#msrv --command cargo build
+
