@@ -27,7 +27,7 @@
     pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, flake-utils, pre-commit-hooks, crane, fenix, ... }:
+  outputs = { self, nixpkgs, rust-overlay, flake-utils, pre-commit-hooks, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         overlays = [ (import rust-overlay) ];
@@ -81,49 +81,8 @@
           libz
         ] ++ libsDarwin;
 
-        # WASM deps
-        WASMInputs = with pkgs; [
-        ];
 
-
-
-        craneLib = crane.mkLib pkgs;
-        src = craneLib.cleanCargoSource ./.;
-
-        # Common arguments can be set here to avoid repeating them later
-        commonArgs = {
-          inherit src;
-          strictDeps = true;
-
-          buildInputs = [
-            # Add additional build inputs here
-            pkgs.protobuf
-            pkgs.pkg-config
-          ] ++ lib.optionals pkgs.stdenv.isDarwin [
-            # Additional darwin specific inputs can be set here
-            pkgs.libiconv
-          ];
-
-          # Additional environment variables can be set directly
-          # MY_CUSTOM_VAR = "some value";
-          PROTOC = "${pkgs.protobuf}/bin/protoc";
-          PROTOC_INCLUDE = "${pkgs.protobuf}/include";
-        };
-
-
-        craneLibLLvmTools = craneLib.overrideToolchain
-          (fenix.packages.${system}.complete.withComponents [
-            "cargo"
-            "llvm-tools"
-            "rustc"
-          ]);
-
-        cargoArtifacts = craneLib.buildDepsOnly commonArgs;
-
-
-
-
-        nativeBuildInputs = with pkgs; [
+        nativeBuildInputs = [
           #Add additional build inputs here
         ] ++ lib.optionals isDarwin [
           # Additional darwin specific native inputs can be set here
@@ -182,13 +141,13 @@
 
 
               ";
-              buildInputs = buildInputs ++ WASMInputs ++ [ msrv_toolchain ];
+              buildInputs = buildInputs ++ [ msrv_toolchain ];
               inherit nativeBuildInputs;
             } // envVars);
 
             stable = pkgs.mkShell ({
               shellHook = ''${_shellHook}'';
-              buildInputs = buildInputs ++ WASMInputs ++ [ stable_toolchain ];
+              buildInputs = buildInputs ++ [ stable_toolchain ];
               inherit nativeBuildInputs;
             } // envVars);
 
@@ -206,29 +165,9 @@
               inherit nativeBuildInputs;
             } // envVars);
 
-            # Shell with Docker for integration tests
-            integration = pkgs.mkShell ({
-              shellHook = ''
-                ${_shellHook}
-                # Ensure Docker is available
-                if ! command -v docker &> /dev/null; then
-                  echo "Docker is not installed or not in PATH"
-                  echo "Please install Docker to run integration tests"
-                  exit 1
-                fi
-                echo "Docker is available at $(which docker)"
-                echo "Docker version: $(docker --version)"
-              '';
-              buildInputs = buildInputs ++ [
-                stable_toolchain
-                pkgs.docker-client
-              ];
-              inherit nativeBuildInputs;
-            } // envVars);
-
           in
           {
-            inherit msrv stable nightly integration;
+            inherit msrv stable nightly;
             default = stable;
           };
       }
