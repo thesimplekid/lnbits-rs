@@ -86,8 +86,8 @@ pub struct DecodeInvoiceResponse {
 pub struct FindInvoiceResponse {
     /// Checking id
     pub checking_id: String,
-    /// Pending (paid)
-    pub pending: bool,
+    /// Status (success)
+    pub status: String,
     /// Amount (sat)
     pub amount: i64,
     /// Fee (msat)
