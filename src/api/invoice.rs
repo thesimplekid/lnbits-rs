@@ -86,8 +86,8 @@ pub struct DecodInvoiceResponse {
 pub struct FindInvoiceResponse {
     /// Checking id
     pub checking_id: String,
-    /// Pending (paid)
-    pub pending: bool,
+    /// Status (success)
+    pub status: String,
     /// Amount (sat)
     pub amount: i64,
     /// Fee (msat)
@@ -95,7 +95,7 @@ pub struct FindInvoiceResponse {
     /// Memo
     pub memo: String,
     /// Time
-    pub time: u64,
+    pub time: String,
     /// Bolt11
     pub bolt11: String,
     /// Preimage
@@ -104,7 +104,7 @@ pub struct FindInvoiceResponse {
     /// Payment hash
     pub payment_hash: String,
     /// Expiry
-    pub expiry: f64,
+    pub expiry: String,
     /// Extra
     pub extra: HashMap<String, serde_json::Value>,
     /// Wallet id
