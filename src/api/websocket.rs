@@ -1,6 +1,6 @@
 //! Websocket
 
-use futures_util::{SinkExt, StreamExt};
+use futures_util::StreamExt;
 use serde::Deserialize;
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
 
@@ -19,21 +19,18 @@ struct WebSocketMessage {
 
 impl LNBitsClient {
     /// Subscribe to websocket updates
-    pub async fn subscribe_to_websocket(
-        &self,
-        sender: tokio::sync::mpsc::Sender<String>,
-    ) -> anyhow::Result<()> {
-        let ws_url = format!(
-            "{}/api/v1/ws/{}",
-            self.lnbits_url.to_string().replace("http", "ws"),
-            self.admin_key
-        );
+    pub async fn subscribe_to_websocket(&self) -> anyhow::Result<()> {
+        let base_url = self
+            .lnbits_url
+            .to_string()
+            .trim_end_matches('/')
+            .replace("http", "ws");
+        let ws_url = format!("{}/api/v1/ws/{}", base_url, self.invoice_read_key);
 
         let (ws_stream, _) = connect_async(ws_url).await?;
-        let (mut write, mut read) = ws_stream.split();
+        let (_, mut read) = ws_stream.split();
 
-        // Subscribe to updates
-        write.send(Message::Text("subscribe".into())).await?;
+        let sender = self.sender.clone();
 
         // Handle incoming messages
         tokio::spawn(async move {
@@ -41,7 +38,7 @@ impl LNBitsClient {
                 match message {
                     Ok(msg) => {
                         if let Message::Text(text) = msg {
-                            tracing::debug!("Received websocket message: {}", text);
+                            tracing::trace!("Received websocket message: {}", text);
 
                             // Parse the message
                             if let Ok(message) = serde_json::from_str::<WebSocketMessage>(&text) {

@@ -28,8 +28,6 @@ pub enum LNBitsEndpoint {
     PaymentsDecode,
     /// Payments endpoint with hash
     PaymentHash(String),
-    /// Find Payements invoice
-    PaymentsFindInvoice(String),
     /// Wallet info endpoint
     Wallet,
 }
@@ -41,9 +39,6 @@ impl fmt::Display for LNBitsEndpoint {
             LNBitsEndpoint::PaymentsDecode => write!(f, "api/v1/payments/decode"),
             LNBitsEndpoint::PaymentHash(hash) => write!(f, "api/v1/payments/{}", hash),
             LNBitsEndpoint::Wallet => write!(f, "api/v1/wallet"),
-            LNBitsEndpoint::PaymentsFindInvoice(checking_id) => {
-                write!(f, "api/v1/payments?checking_id={}", checking_id)
-            }
         }
     }
 }
@@ -59,7 +54,7 @@ impl crate::LNBitsClient {
         let response = self
             .reqwest_client
             .get(url)
-            .header("X-Api-Key", {
+            .header("x-api-key", {
                 match key {
                     LNBitsRequestKey::Admin => self.admin_key.clone(),
                     LNBitsRequestKey::InvoiceRead => self.invoice_read_key.clone(),
@@ -69,6 +64,7 @@ impl crate::LNBitsClient {
             .await?;
 
         if response.status() == reqwest::StatusCode::NOT_FOUND {
+            println!("{:?}", response);
             bail!("Not found")
         }
 
@@ -99,6 +95,8 @@ impl crate::LNBitsClient {
             .await?;
 
         if response.status() == reqwest::StatusCode::NOT_FOUND {
+            println!("{:?}", response);
+            println!("{:?}", response.text().await.unwrap());
             bail!("Not Found")
         }
 
