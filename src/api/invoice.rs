@@ -57,7 +57,7 @@ pub struct CreateInvoiceRequest {
 
 /// Decode invoice response
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct DecodInvoiceResponse {
+pub struct DecodeInvoiceResponse {
     /// Payment hash
     pub payment_hash: String,
     /// Amount (msat)
@@ -166,7 +166,7 @@ impl crate::LNBitsClient {
     }
 
     /// Decode invoice
-    pub async fn decode_invoice(&self, invoice: &str) -> Result<DecodInvoiceResponse> {
+    pub async fn decode_invoice(&self, invoice: &str) -> Result<DecodeInvoiceResponse> {
         let body = self
             .make_post(
                 LNBitsEndpoint::PaymentsDecode,
