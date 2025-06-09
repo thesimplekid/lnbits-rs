@@ -21,9 +21,10 @@ impl LNBitsClient {
     pub async fn create_invoice_webhook_router(
         &self,
         webhook_endpoint: &str,
-        sender: tokio::sync::mpsc::Sender<String>,
     ) -> anyhow::Result<Router> {
-        let state = WebhookState { sender };
+        let state = WebhookState {
+            sender: self.sender.clone(),
+        };
 
         let router = Router::new()
             .route(webhook_endpoint, post(handle_invoice))

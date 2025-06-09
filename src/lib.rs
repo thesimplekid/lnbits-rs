@@ -2,8 +2,11 @@
 #![warn(missing_docs)]
 #![warn(rustdoc::bare_urls)]
 
+use std::sync::Arc;
+
 use anyhow::Result;
 use reqwest::Url;
+use tokio::sync::Mutex;
 
 pub mod api;
 
@@ -16,6 +19,10 @@ pub struct LNBitsClient {
     lnbits_url: Url,
     // tor_socket: Option<String>, // Can be used later
     reqwest_client: reqwest::Client,
+    /// Update sender
+    receiver: Arc<Mutex<tokio::sync::mpsc::Receiver<String>>>,
+    /// Update sender
+    sender: tokio::sync::mpsc::Sender<String>,
 }
 
 impl LNBitsClient {
@@ -39,6 +46,8 @@ impl LNBitsClient {
             }
         };
 
+        let (sender, receiver) = tokio::sync::mpsc::channel(8);
+
         Ok(LNBitsClient {
             // wallet_id,
             admin_key: admin_key.to_string(),
@@ -46,6 +55,13 @@ impl LNBitsClient {
             lnbits_url,
             // tor_socket,
             reqwest_client: client,
+            sender,
+            receiver: Arc::new(Mutex::new(receiver)),
         })
+    }
+
+    /// Incoming Receiver
+    pub fn receiver(&self) -> &Arc<Mutex<tokio::sync::mpsc::Receiver<String>>> {
+        &self.receiver
     }
 }
