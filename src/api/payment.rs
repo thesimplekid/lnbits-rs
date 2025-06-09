@@ -51,7 +51,8 @@ pub struct PaymentDetails {
     pub pending: Option<bool>,
 }
 
-/// Custom deserializer for time field that can handle both u64 and string formats
+/// Custom deserializer for time field that can handle both u64 and string
+/// formats
 fn deserialize_time<'de, D>(deserializer: D) -> Result<String, D::Error>
 where
     D: Deserializer<'de>,
