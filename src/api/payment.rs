@@ -46,7 +46,7 @@ pub struct Payment {
     /// Paid
     pub paid: bool,
     /// Preimage
-    pub preimage: String,
+    pub preimage: Option<String>,
     /// Details
     pub details: PaymentDetails,
 }
