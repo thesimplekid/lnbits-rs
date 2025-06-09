@@ -10,8 +10,6 @@ use super::LNBitsEndpoint;
 pub struct PaymentDetails {
     /// Payment status
     pub status: String,
-    /// Pending
-    pub pending: bool,
     /// Checking id
     pub checking_id: String,
     /// Amount
@@ -21,15 +19,15 @@ pub struct PaymentDetails {
     /// Memo
     pub memo: String,
     /// Time
-    pub time: u64,
+    pub time: String,
     /// BOld11
     pub bolt11: String,
     /// Preimage
-    pub preimage: String,
+    pub preimage: Option<String>,
     /// Payment hash
     pub payment_hash: String,
     /// Expiry
-    pub expiry: u64,
+    pub expiry: String,
     /// Extra
     pub extra: serde_json::Value,
     /// Wallet id
