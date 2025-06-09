@@ -61,7 +61,7 @@ impl LNBitsClient {
     }
 
     /// Incoming Receiver
-    pub fn receiver(&self) -> &Arc<Mutex<tokio::sync::mpsc::Receiver<String>>> {
-        &self.receiver
+    pub fn receiver(&self) -> Arc<Mutex<tokio::sync::mpsc::Receiver<String>>> {
+        self.receiver.clone()
     }
 }
