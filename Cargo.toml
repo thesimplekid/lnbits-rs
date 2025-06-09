@@ -24,6 +24,7 @@ serde_json = { version = "1", default-features = false, features = ["std"] }
 serde = { version = "1", default-features = false, features = ["derive"] }
 url = "2.3"
 log = "0.4"
+chrono = "0.4.41"
 
 [profile]
 

@@ -3,7 +3,6 @@
 use std::fmt;
 
 use anyhow::{bail, Result};
-use serde::{Deserialize, Serialize};
 
 pub mod invoice;
 pub mod payment;
@@ -11,7 +10,7 @@ pub mod wallet;
 pub mod webhook;
 
 /// LNbits api key type
-#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash)]
 pub enum LNBitsRequestKey {
     /// Admin api key
     Admin,
@@ -20,7 +19,7 @@ pub enum LNBitsRequestKey {
 }
 
 /// LNbits endpoints
-#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash)]
 pub enum LNBitsEndpoint {
     /// Payments endpoint
     Payments,
