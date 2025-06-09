@@ -18,9 +18,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
-      - name: Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/nix-installer-action@v17
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
       - name: Cargo fmt
@@ -41,9 +39,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
-      - name: Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/nix-installer-action@v17
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
       - name: Clippy
@@ -58,9 +54,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
-      - name: Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/nix-installer-action@v17
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
       - name: Build
