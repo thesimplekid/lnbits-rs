@@ -45,6 +45,10 @@ pub struct PaymentDetails {
     pub webhook: Option<String>,
     /// Webhook status
     pub webhook_status: Option<String>,
+    /// Pending
+    ///
+    /// Pre v1
+    pub pending: Option<bool>,
 }
 
 /// Custom deserializer for time field that can handle both u64 and string formats
