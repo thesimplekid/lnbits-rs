@@ -1,24 +1,27 @@
 //! Invoice related api
 
-use std::collections::HashMap;
-
-use anyhow::{anyhow, bail, Result};
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 
-use super::{LNBitsEndpoint, LNBitsRequestKey};
+use super::LNBitsEndpoint;
 
 /// Create invoice response
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct CreateInvoiceResponse {
     /// Payment hash
-    pub payment_hash: String,
+    payment_hash: String,
     /// Bolt11
-    pub bolt11: Option<String>,
-    /// payment request (PRE v1)
-    pub payment_request: Option<String>,
+    bolt11: Option<String>,
+    /// Payment request (PRE v1)
+    payment_request: Option<String>,
 }
 
 impl CreateInvoiceResponse {
+    /// Payment hash
+    pub fn payment_hash(&self) -> &str {
+        &self.payment_hash
+    }
+
     /// Get bolt11 from response
     pub fn bolt11(&self) -> Option<String> {
         self.bolt11.clone().or_else(|| self.payment_request.clone())
@@ -26,7 +29,7 @@ impl CreateInvoiceResponse {
 }
 
 /// Pay invoice response
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize)]
 pub struct PayInvoiceResponse {
     /// Payment hash
     pub payment_hash: String,
@@ -56,7 +59,7 @@ pub struct CreateInvoiceRequest {
 }
 
 /// Decode invoice response
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct DecodeInvoiceResponse {
     /// Payment hash
     pub payment_hash: String,
@@ -79,42 +82,6 @@ pub struct DecodeInvoiceResponse {
     pub route_hints: Vec<String>,
     /// Mint final cltx expiry
     pub min_final_cltv_expiry: i64,
-}
-
-/// Find invoice response
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct FindInvoiceResponse {
-    /// Checking id
-    pub checking_id: String,
-    /// Pending (paid)
-    pub pending: bool,
-    /// Amount (sat)
-    pub amount: i64,
-    /// Fee (msat)
-    pub fee: i64,
-    /// Memo
-    pub memo: String,
-    /// Time
-    pub time: u64,
-    /// Bolt11
-    pub bolt11: String,
-    /// Preimage
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub preimage: Option<String>,
-    /// Payment hash
-    pub payment_hash: String,
-    /// Expiry
-    pub expiry: f64,
-    /// Extra
-    pub extra: HashMap<String, serde_json::Value>,
-    /// Wallet id
-    pub wallet_id: String,
-    /// Webhook url
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub webhook: Option<String>,
-    /// Webhook status
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub webhook_status: Option<String>,
 }
 
 impl crate::LNBitsClient {
@@ -196,25 +163,5 @@ impl crate::LNBitsClient {
 
         let invoice_result: serde_json::Value = serde_json::from_str(&body)?;
         Ok(invoice_result["paid"].as_bool().unwrap_or(false))
-    }
-
-    /// Find invoice
-    pub async fn find_invoice(&self, checking_id: &str) -> Result<FindInvoiceResponse> {
-        let endpoint = LNBitsEndpoint::PaymentsFindInvoice(checking_id.to_string());
-
-        let body = self.make_get(endpoint, LNBitsRequestKey::Admin).await?;
-
-        match serde_json::from_str::<Vec<FindInvoiceResponse>>(&body) {
-            Ok(res) => {
-                let found = res.first().ok_or(anyhow!("Could not find invoice"))?;
-
-                Ok(found.to_owned())
-            }
-            Err(_) => {
-                log::error!("Api error response decode invoice");
-                log::error!("{}", body);
-                bail!("Could not decode invoice")
-            }
-        }
     }
 }

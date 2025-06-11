@@ -4,9 +4,9 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
+use serde::Deserialize;
 use serde_json::Value;
 
-use crate::api::invoice::FindInvoiceResponse;
 use crate::LNBitsClient;
 
 /// Webhook state
@@ -21,9 +21,10 @@ impl LNBitsClient {
     pub async fn create_invoice_webhook_router(
         &self,
         webhook_endpoint: &str,
-        sender: tokio::sync::mpsc::Sender<String>,
     ) -> anyhow::Result<Router> {
-        let state = WebhookState { sender };
+        let state = WebhookState {
+            sender: self.sender.clone(),
+        };
 
         let router = Router::new()
             .route(webhook_endpoint, post(handle_invoice))
@@ -33,11 +34,18 @@ impl LNBitsClient {
     }
 }
 
+/// Webhook request
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct WebhookRequest {
+    /// Checking id
+    pub checking_id: String,
+}
+
 async fn handle_invoice(
     State(state): State<WebhookState>,
     Json(payload): Json<Value>,
 ) -> Result<StatusCode, StatusCode> {
-    let webhook_response: FindInvoiceResponse =
+    let webhook_response: WebhookRequest =
         serde_json::from_value(payload.clone()).map_err(|_err| {
             log::warn!("Got an invalid payload on webhook");
             log::debug!("Value: {}", payload);
