@@ -46,9 +46,6 @@ pub struct CreateInvoiceRequest {
     /// Expiry is in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
-    /// Webhook url
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub webhook: Option<String>,
     /// Internal payment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub internal: Option<bool>,
