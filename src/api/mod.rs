@@ -7,7 +7,6 @@ use anyhow::{bail, Result};
 pub mod invoice;
 pub mod payment;
 pub mod wallet;
-pub mod webhook;
 pub mod websocket;
 
 /// LNbits api key type

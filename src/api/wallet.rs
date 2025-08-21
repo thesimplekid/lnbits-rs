@@ -12,8 +12,6 @@ pub struct WalletDetails {
     pub id: Option<String>,
     /// Name
     pub name: String,
-    /// Balance
-    pub balance: i64,
 }
 
 impl crate::LNBitsClient {

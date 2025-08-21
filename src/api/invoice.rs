@@ -11,9 +11,7 @@ pub struct CreateInvoiceResponse {
     /// Payment hash
     payment_hash: String,
     /// Bolt11
-    bolt11: Option<String>,
-    /// Payment request (PRE v1)
-    payment_request: Option<String>,
+    bolt11: String,
 }
 
 impl CreateInvoiceResponse {
@@ -23,8 +21,8 @@ impl CreateInvoiceResponse {
     }
 
     /// Get bolt11 from response
-    pub fn bolt11(&self) -> Option<String> {
-        self.bolt11.clone().or_else(|| self.payment_request.clone())
+    pub fn bolt11(&self) -> &str {
+        &self.bolt11
     }
 }
 
@@ -48,9 +46,6 @@ pub struct CreateInvoiceRequest {
     /// Expiry is in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<u64>,
-    /// Webhook url
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub webhook: Option<String>,
     /// Internal payment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub internal: Option<bool>,
