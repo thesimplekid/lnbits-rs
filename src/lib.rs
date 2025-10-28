@@ -19,10 +19,10 @@ pub struct LNBitsClient {
     lnbits_url: Url,
     // tor_socket: Option<String>, // Can be used later
     reqwest_client: reqwest::Client,
-    /// Update sender
+    /// Update receiver
     receiver: Arc<Mutex<tokio::sync::mpsc::Receiver<String>>>,
     /// Update sender
-    sender: tokio::sync::mpsc::Sender<String>,
+    sender: Arc<Mutex<tokio::sync::mpsc::Sender<String>>>,
 }
 
 impl LNBitsClient {
@@ -55,7 +55,7 @@ impl LNBitsClient {
             lnbits_url,
             // tor_socket,
             reqwest_client: client,
-            sender,
+            sender: Arc::new(Mutex::new(sender)),
             receiver: Arc::new(Mutex::new(receiver)),
         })
     }
